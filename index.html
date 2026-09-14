@@ -56,7 +56,6 @@
             transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease;
         }
 
-        /* Theme Toggle Button Style */
         .theme-toggle {
             position: absolute;
             top: 30px;
@@ -88,7 +87,7 @@
             border-bottom: 1px solid var(--glass-border);
             padding-bottom: 15px;
             margin-top: 0;
-            margin-right: 110px; /* Space for the floating button */
+            margin-right: 110px;
         }
 
         h2 {
@@ -192,6 +191,7 @@
     </div>
 
     <script>
+        // Toggle Light/Dark Mode
         function toggleTheme() {
             const html = document.documentElement;
             const toggleBtn = document.getElementById('themeToggle');
@@ -204,6 +204,11 @@
                 toggleBtn.textContent = '☀️ Light';
             }
         }
+
+        // Disable right-click context menu
+        document.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+        });
     </script>
 </body>
 </html>
