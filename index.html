@@ -91,6 +91,8 @@
         .toolbar {
             display: flex;
             gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
         .pen-options {
@@ -167,6 +169,44 @@
         }
 
         .tool-btn.active {
+            background: var(--accent-color);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        /* Circular Icon-Only Fullscreen Button Styles */
+        .icon-circle-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-border-top);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.05rem;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            -webkit-user-select: none;
+            user-select: none;
+            padding: 0;
+        }
+
+        .icon-circle-btn:hover {
+            background: var(--glass-bg-hover);
+            color: var(--accent-color);
+            box-shadow: 0 0 20px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.4);
+            border-color: var(--accent-color);
+            transform: translateY(-1px) scale(1.05);
+        }
+
+        .icon-circle-btn.active {
             background: var(--accent-color);
             color: #ffffff;
             border-color: transparent;
@@ -344,6 +384,7 @@
                 <button class="tool-btn" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
                 <button class="tool-btn" id="readBtn" onclick="toggleSpeech()">🔊 Read</button>
                 <button class="tool-btn" id="penBtn" onclick="togglePen()">✏️ Pen</button>
+                <button class="icon-circle-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Toggle Fullscreen">⛶</button>
             </div>
             <!-- Expanded Pen Options & Eraser Submenu -->
             <div class="pen-options" id="penOptions">
@@ -441,6 +482,29 @@
                 toggleBtn.textContent = '☀️ Light';
             }
         }
+
+        // Fullscreen Toggle Functionality
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable fullscreen mode: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Update Fullscreen button active state on change
+        document.addEventListener('fullscreenchange', () => {
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            if (document.fullscreenElement) {
+                fullscreenBtn.classList.add('active');
+            } else {
+                fullscreenBtn.classList.remove('active');
+            }
+        });
 
         // Screen Reader (Text-to-Speech) Functionality
         let synth = window.speechSynthesis;
