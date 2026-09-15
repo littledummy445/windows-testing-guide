@@ -60,14 +60,14 @@
             transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease;
         }
 
-        /* Toolbar for Controls */
+        /* Toolbar with higher z-index so buttons stay clickable */
         .toolbar {
             position: absolute;
             top: 30px;
             right: 30px;
             display: flex;
             gap: 10px;
-            z-index: 10;
+            z-index: 1001;
         }
 
         .tool-btn {
@@ -105,7 +105,7 @@
             border-bottom: 1px solid var(--glass-border);
             padding-bottom: 15px;
             margin-top: 0;
-            margin-right: 220px; /* Adjusted spacing for multi-button toolbar */
+            margin-right: 220px;
         }
 
         h2 {
