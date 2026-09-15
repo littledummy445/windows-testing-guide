@@ -33,17 +33,24 @@
             --card-bg: rgba(255, 255, 255, 0.45);
         }
 
-        /* Custom Transparent Glass Scrollbar */
+        /* Universal & Modern Standard Scrollbar Styles */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        }
+
+        /* WebKit Transparent Glass Scrollbar Fixes */
         ::-webkit-scrollbar {
             width: 8px;
+            height: 8px;
         }
 
         ::-webkit-scrollbar-track {
-            background: transparent;
+            background: transparent !important;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 4px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -52,6 +59,10 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--accent-color);
             box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        ::-webkit-scrollbar-corner {
+            background: transparent;
         }
 
         body {
@@ -69,7 +80,6 @@
             -moz-user-select: text;
             -ms-user-select: text;
             user-select: text;
-            scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
         }
 
         .container {
