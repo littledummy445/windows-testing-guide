@@ -57,17 +57,66 @@
             box-shadow: var(--glass-shadow);
             padding: 40px;
             position: relative;
-            overflow: hidden; /* Hard clips anything outside the card borders */
+            overflow: hidden;
             transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .toolbar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 10;
         }
 
         .toolbar {
             display: flex;
             gap: 10px;
-            justify-content: flex-end;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 10;
+        }
+
+        /* Pen options expandable sub-toolbar */
+        .pen-options {
+            display: none;
+            gap: 8px;
+            align-items: center;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 6px 12px;
+            border-radius: 30px;
+            margin-top: 10px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        .pen-options.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .color-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--glass-border);
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            padding: 0;
+        }
+
+        .color-dot:hover {
+            transform: scale(1.15);
+        }
+
+        .color-dot.active {
+            border-color: var(--text-color);
+            transform: scale(1.2);
         }
 
         .tool-btn {
@@ -159,7 +208,6 @@
             text-shadow: 0 0 8px var(--accent-glow);
         }
 
-        /* Strictly bounds canvas inside the container padding box */
         #drawCanvas {
             position: absolute;
             top: 0;
@@ -176,8 +224,10 @@
             .container {
                 padding: 20px;
             }
+            .toolbar-wrapper {
+                align-items: flex-start;
+            }
             .toolbar {
-                justify-content: flex-start;
                 flex-wrap: wrap;
             }
         }
@@ -189,11 +239,22 @@
         <!-- Drawing Canvas Locked Inside Article -->
         <canvas id="drawCanvas"></canvas>
 
-        <!-- Control Toolbar -->
-        <div class="toolbar">
-            <button class="tool-btn" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
-            <button class="tool-btn" id="readBtn" onclick="toggleSpeech()">🔊 Read</button>
-            <button class="tool-btn" id="penBtn" onclick="togglePen()">✏️ Pen</button>
+        <!-- Control Toolbar & Sub-menu -->
+        <div class="toolbar-wrapper">
+            <div class="toolbar">
+                <button class="tool-btn" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
+                <button class="tool-btn" id="readBtn" onclick="toggleSpeech()">🔊 Read</button>
+                <button class="tool-btn" id="penBtn" onclick="togglePen()">✏️ Pen</button>
+            </div>
+            <!-- Expanded Pen Options & Eraser Submenu -->
+            <div class="pen-options" id="penOptions">
+                <button class="color-dot active" style="background: #38bdf8;" data-color="#38bdf8" onclick="setColor('#38bdf8', this)"></button>
+                <button class="color-dot" style="background: #34d399;" data-color="#34d399" onclick="setColor('#34d399', this)"></button>
+                <button class="color-dot" style="background: #fb7185;" data-color="#fb7185" onclick="setColor('#fb7185', this)"></button>
+                <button class="color-dot" style="background: #fbbf24;" data-color="#fbbf24" onclick="setColor('#fbbf24', this)"></button>
+                <button class="color-dot" style="background: #ffffff;" data-color="#ffffff" onclick="setColor('#ffffff', this)"></button>
+                <button class="tool-btn" id="eraserBtn" onclick="toggleEraser()">🧹 Eraser</button>
+            </div>
         </div>
 
         <h1>How to Test Windows Applications Remotely Using Cloud Desktops</h1>
@@ -271,15 +332,16 @@
             }
         }
 
-        // Pen Tools / Annotation Canvas Logic (Strictly Container-Bound)
+        // Pen & Eraser Canvas Logic
         const canvas = document.getElementById('drawCanvas');
         const container = document.querySelector('.container');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
         let penActive = false;
+        let currentTool = 'pen'; // 'pen' or 'eraser'
+        let currentColor = '#38bdf8';
 
         function resizeCanvas() {
-            // Explicitly set pixel dimensions to match container inner bounds
             canvas.width = container.clientWidth;
             canvas.height = container.scrollHeight;
         }
@@ -289,14 +351,41 @@
         function togglePen() {
             penActive = !penActive;
             const penBtn = document.getElementById('penBtn');
+            const penOptions = document.getElementById('penOptions');
+            
             if (penActive) {
                 canvas.classList.add('active');
                 penBtn.classList.add('active');
                 penBtn.textContent = '❌ Close Pen';
+                penOptions.classList.add('active');
             } else {
                 canvas.classList.remove('active');
                 penBtn.classList.remove('active');
                 penBtn.textContent = '✏️ Pen';
+                penOptions.classList.remove('active');
+                // Reset eraser mode back to pen when closed
+                currentTool = 'pen';
+                document.getElementById('eraserBtn').classList.remove('active');
+            }
+        }
+
+        function setColor(color, element) {
+            currentTool = 'pen';
+            currentColor = color;
+            document.getElementById('eraserBtn').classList.remove('active');
+            
+            // Update active dot visual style
+            document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function toggleEraser() {
+            if (currentTool === 'eraser') {
+                currentTool = 'pen';
+                document.getElementById('eraserBtn').classList.remove('active');
+            } else {
+                currentTool = 'eraser';
+                document.getElementById('eraserBtn').classList.add('active');
             }
         }
 
@@ -314,11 +403,17 @@
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
-            // Strict boundary restriction check
             if (x < 0 || x > canvas.width || y < 0 || y > canvas.height) return;
 
-            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#38bdf8';
-            ctx.lineWidth = 3;
+            if (currentTool === 'eraser') {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = 20; // Thicker stroke for easy erasing
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = 3;
+            }
+
             ctx.lineCap = 'round';
             ctx.lineTo(x, y);
             ctx.stroke();
