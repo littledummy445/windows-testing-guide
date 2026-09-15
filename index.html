@@ -274,6 +274,23 @@
             line-height: 1.5;
         }
 
+        .github-repo-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            padding: 10px 14px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .github-repo-info a {
+            font-weight: 500;
+        }
+
         .footer-bottom {
             display: flex;
             justify-content: space-between;
@@ -367,6 +384,20 @@
             <li><strong>Capture Diagnostic Telemetry:</strong> Keep crash reporting tools and event viewers handy within the remote container to log uncaught exceptions seamlessly.</li>
         </ul>
 
+        <h2>Automating Quality Assurance in Cloud Environments</h2>
+        <ul>
+            <li><strong>Integrate UI Automation Scripts:</strong> Run Selenium, Playwright, or Appium scripts inside the remote desktop container to replicate user clicks and navigation flows automatically.</li>
+            <li><strong>Schedule Automated Smoke Tests:</strong> Set up scheduled intervals to pull fresh nightly builds and run baseline health validations before team members begin their workdays.</li>
+            <li><strong>Parallel Test Execution:</strong> Spin up multiple concurrent cloud desktop instances to execute distinct test suites simultaneously, reducing overall regression cycle times.</li>
+        </ul>
+
+        <h2>Security and Data Privacy Considerations</h2>
+        <ol>
+            <li><strong>Sanitize Session Data:</strong> Always log out and clear browser profile caches, temporary application data, and credentials upon finishing a testing cycle.</li>
+            <li><strong>Restrict External Clipboard Sharing:</strong> Configure remote display policies to limit bidirectional clipboard syncing if you are handling sensitive internal source code or tokens.</li>
+            <li><strong>Use Encrypted Tunnels:</strong> Ensure remote browser communication channels utilize secure HTTPS/WSS protocols to prevent potential man-in-the-middle data snooping.</li>
+        </ol>
+
         <h2>Troubleshooting Common Latency Issues</h2>
         <ol>
             <li><strong>Check Network Stability:</strong> Ensure your local internet connection maintains low jitter, as cloud streaming relies heavily on steady packet flow.</li>
@@ -384,6 +415,12 @@
     <footer class="footer">
         <p class="footer-title">How to Test Windows Applications Remotely Using Cloud Desktops</p>
         <p class="footer-desc">A comprehensive guide and toolkit for developers and QA engineers looking to streamline software testing workflows across remote Windows cloud instances directly inside modern web browsers.</p>
+        
+        <!-- GitHub Repository Description Box -->
+        <div class="github-repo-info">
+            <span>📦 <strong>GitHub Repository:</strong> Source code for this interactive guide featuring custom canvas annotation tools, text-to-speech narration, and dynamic glassmorphism themes. (<a href="#" target="_blank">View on GitHub</a>)</span>
+        </div>
+
         <div class="footer-bottom">
             <span>&copy; 2026 Cloud Testing Guide. All rights reserved.</span>
             <span>Secure Browser Environment</span>
