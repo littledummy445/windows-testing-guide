@@ -57,17 +57,16 @@
             box-shadow: var(--glass-shadow);
             padding: 40px;
             position: relative;
+            z-index: 10;
             transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease;
         }
 
-        /* Toolbar with higher z-index so buttons stay clickable */
+        /* Toolbar inside container flow */
         .toolbar {
-            position: absolute;
-            top: 30px;
-            right: 30px;
             display: flex;
             gap: 10px;
-            z-index: 1001;
+            justify-content: flex-end;
+            margin-bottom: 20px;
         }
 
         .tool-btn {
@@ -105,7 +104,6 @@
             border-bottom: 1px solid var(--glass-border);
             padding-bottom: 15px;
             margin-top: 0;
-            margin-right: 220px;
         }
 
         h2 {
@@ -180,15 +178,8 @@
                 padding: 20px;
             }
             .toolbar {
-                position: relative;
-                top: 0;
-                right: 0;
-                margin-bottom: 20px;
+                justify-content: flex-start;
                 flex-wrap: wrap;
-            }
-            h1 {
-                font-size: 1.6em;
-                margin-right: 0;
             }
         }
     </style>
