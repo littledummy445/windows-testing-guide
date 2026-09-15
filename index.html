@@ -40,8 +40,6 @@
             margin: 0;
             padding: 40px 20px;
             transition: background 0.4s ease, color 0.4s ease;
-            
-            /* Allow text highlighting/selection */
             -webkit-user-select: text;
             -moz-user-select: text;
             -ms-user-select: text;
@@ -62,17 +60,24 @@
             transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease;
         }
 
-        .theme-toggle {
+        /* Toolbar for Controls */
+        .toolbar {
             position: absolute;
             top: 30px;
             right: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .tool-btn {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             color: var(--text-color);
-            padding: 10px 16px;
+            padding: 10px 14px;
             border-radius: 30px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
@@ -82,11 +87,16 @@
             user-select: none;
         }
 
-        .theme-toggle:hover {
+        .tool-btn:hover {
             background: var(--accent-color);
             color: #ffffff;
             box-shadow: 0 0 15px var(--accent-glow);
             border-color: transparent;
+        }
+
+        .tool-btn.active {
+            background: var(--accent-color);
+            color: #ffffff;
         }
 
         h1 {
@@ -95,7 +105,7 @@
             border-bottom: 1px solid var(--glass-border);
             padding-bottom: 15px;
             margin-top: 0;
-            margin-right: 110px;
+            margin-right: 220px; /* Adjusted spacing for multi-button toolbar */
         }
 
         h2 {
@@ -150,26 +160,50 @@
             text-shadow: 0 0 8px var(--accent-glow);
         }
 
-        @media (max-width: 600px) {
+        /* Drawing Canvas Overlay */
+        #drawCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 999;
+        }
+        #drawCanvas.active {
+            pointer-events: auto;
+            cursor: crosshair;
+        }
+
+        @media (max-width: 768px) {
             .container {
                 padding: 20px;
+            }
+            .toolbar {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
             }
             h1 {
                 font-size: 1.6em;
                 margin-right: 0;
-                margin-top: 50px;
-            }
-            .theme-toggle {
-                top: 20px;
-                right: 20px;
             }
         }
     </style>
 </head>
 <body>
 
+    <canvas id="drawCanvas"></canvas>
+
     <div class="container">
-        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
+        <!-- Control Toolbar -->
+        <div class="toolbar">
+            <button class="tool-btn" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
+            <button class="tool-btn" id="readBtn" onclick="toggleSpeech()">🔊 Read</button>
+            <button class="tool-btn" id="penBtn" onclick="togglePen()">✏️ Pen</button>
+        </div>
 
         <h1>How to Test Windows Applications Remotely Using Cloud Desktops</h1>
         
@@ -213,7 +247,86 @@
             }
         }
 
-        // Block right-clicks and context menus
+        // Screen Reader (Text-to-Speech) Functionality
+        let synth = window.speechSynthesis;
+        let isReading = false;
+
+        function toggleSpeech() {
+            const readBtn = document.getElementById('readBtn');
+            if (isReading) {
+                synth.cancel();
+                isReading = false;
+                readBtn.classList.remove('active');
+                readBtn.textContent = '🔊 Read';
+            } else {
+                if (!synth) {
+                    alert("Text-to-speech is not supported in this browser.");
+                    return;
+                }
+                const textContent = document.querySelector('.container').innerText;
+                let utterance = new SpeechSynthesisUtterance(textContent);
+                utterance.rate = 1.0;
+                
+                utterance.onend = function() {
+                    isReading = false;
+                    readBtn.classList.remove('active');
+                    readBtn.textContent = '🔊 Read';
+                };
+
+                synth.speak(utterance);
+                isReading = true;
+                readBtn.classList.add('active');
+                readBtn.textContent = '⏹ Stop';
+            }
+        }
+
+        // Pen Tools / Annotation Canvas Logic
+        const canvas = document.getElementById('drawCanvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let penActive = false;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function togglePen() {
+            penActive = !penActive;
+            const penBtn = document.getElementById('penBtn');
+            if (penActive) {
+                canvas.classList.add('active');
+                penBtn.classList.add('active');
+                penBtn.textContent = '❌ Close Pen';
+            } else {
+                canvas.classList.remove('active');
+                penBtn.classList.remove('active');
+                penBtn.textContent = '✏️ Pen';
+            }
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (!penActive) return;
+            isDrawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.clientX, e.clientY);
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing || !penActive) return;
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#38bdf8';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineTo(e.clientX, e.clientY);
+            ctx.stroke();
+        });
+
+        canvas.addEventListener('mouseup', () => { isDrawing = false; });
+        canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+
+        // Security: Block right-clicks and context menus
         window.addEventListener('contextmenu', function(e) {
             e.preventDefault();
             return false;
@@ -226,7 +339,7 @@
             }
         });
 
-        // Thoroughly clear clipboard data on copy/cut attempts
+        // Security: Clear clipboard data on copy/cut attempts while preserving highlighting
         document.addEventListener('copy', function(e) {
             e.clipboardData.setData('text/plain', '');
             e.preventDefault();
