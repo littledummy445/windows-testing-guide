@@ -437,6 +437,30 @@
 
         canvas.addEventListener('mouseup', () => isDrawing = false);
         canvas.addEventListener('mouseleave', () => isDrawing = false);
+
+        // Security: Block right-clicks and context menus
+        window.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        window.addEventListener('mousedown', function(e) {
+            if (e.button === 2) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Security: Clear clipboard data on copy/cut attempts
+        document.addEventListener('copy', function(e) {
+            e.clipboardData.setData('text/plain', '');
+            e.preventDefault();
+        });
+
+        document.addEventListener('cut', function(e) {
+            e.clipboardData.setData('text/plain', '');
+            e.preventDefault();
+        });
     </script>
 </body>
 </html>
