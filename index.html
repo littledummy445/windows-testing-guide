@@ -40,6 +40,12 @@
             margin: 0;
             padding: 40px 20px;
             transition: background 0.4s ease, color 0.4s ease;
+            
+            /* Allow text selection/highlighting */
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
         .container {
@@ -72,6 +78,10 @@
             -webkit-backdrop-filter: blur(8px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
+            
+            /* Prevent selecting the button text */
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .theme-toggle:hover {
@@ -205,18 +215,28 @@
             }
         }
 
-        // Aggressively block right-clicks and context menus
+        // Block right-clicks and context menus
         window.addEventListener('contextmenu', function(e) {
             e.preventDefault();
             return false;
         });
 
         window.addEventListener('mousedown', function(e) {
-            // Check if it's a right click (button 2)
             if (e.button === 2) {
                 e.preventDefault();
                 return false;
             }
+        });
+
+        // Block copying text while allowing text selection/highlighting
+        document.addEventListener('copy', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        document.addEventListener('cut', function(e) {
+            e.preventDefault();
+            return false;
         });
     </script>
 </body>
