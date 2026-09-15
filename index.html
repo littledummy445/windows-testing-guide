@@ -6,27 +6,31 @@
     <title>How to Test Windows Applications Remotely Using Cloud Desktops</title>
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --bg-gradient: radial-gradient(circle at 15% 15%, #1e1b4b 0%, #0f172a 50%, #090d16 100%);
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-bg-hover: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-border-top: rgba(255, 255, 255, 0.25);
+            --glass-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
             --text-color: #f1f5f9;
             --text-muted: #94a3b8;
             --accent-color: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.3);
-            --card-bg: rgba(15, 23, 42, 0.6);
+            --accent-glow: rgba(56, 189, 248, 0.35);
+            --card-bg: rgba(30, 41, 59, 0.45);
         }
 
         [data-theme="light"] {
-            --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 50%, #fae8ff 100%);
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            --bg-gradient: radial-gradient(circle at 15% 15%, #e0f2fe 0%, #f0fdf4 50%, #fae8ff 100%);
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-bg-hover: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-border-top: rgba(255, 255, 255, 0.9);
+            --glass-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
             --text-color: #0f172a;
             --text-muted: #475569;
             --accent-color: #0284c7;
-            --accent-glow: rgba(2, 132, 199, 0.2);
-            --card-bg: rgba(255, 255, 255, 0.5);
+            --accent-glow: rgba(2, 132, 199, 0.25);
+            --card-bg: rgba(255, 255, 255, 0.45);
         }
 
         body {
@@ -39,7 +43,7 @@
             min-height: 100vh;
             margin: 0;
             padding: 40px 20px;
-            transition: background 0.4s ease, color 0.4s ease;
+            transition: background 0.5s ease, color 0.4s ease;
             -webkit-user-select: text;
             -moz-user-select: text;
             -ms-user-select: text;
@@ -50,15 +54,29 @@
             max-width: 800px;
             margin: 0 auto;
             background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
+            border-top: 1px solid var(--glass-border-top);
+            border-radius: 24px;
             box-shadow: var(--glass-shadow);
             padding: 40px;
             position: relative;
             overflow: hidden;
             transition: background 0.4s ease, border 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        /* Ambient Glass Reflection Effect */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent);
+            pointer-events: none;
+            transform: rotate(-5deg);
         }
 
         .toolbar-wrapper {
@@ -75,20 +93,20 @@
             gap: 10px;
         }
 
-        /* Pen options expandable sub-toolbar */
         .pen-options {
             display: none;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            padding: 6px 12px;
-            border-radius: 30px;
-            margin-top: 10px;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            animation: fadeIn 0.2s ease-in-out;
+            border-top: 1px solid var(--glass-border-top);
+            padding: 8px 16px;
+            border-radius: 40px;
+            margin-top: 12px;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            box-shadow: var(--glass-shadow);
+            animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .pen-options.active {
@@ -96,56 +114,63 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .color-dot {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             border: 2px solid var(--glass-border);
             cursor: pointer;
-            transition: transform 0.2s ease, border-color 0.2s ease;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease, box-shadow 0.2s ease;
             padding: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
 
         .color-dot:hover {
-            transform: scale(1.15);
+            transform: scale(1.2);
+            box-shadow: 0 0 10px var(--accent-glow);
         }
 
         .color-dot.active {
             border-color: var(--text-color);
-            transform: scale(1.2);
+            transform: scale(1.25);
+            box-shadow: 0 0 12px var(--accent-glow);
         }
 
         .tool-btn {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-border-top);
             color: var(--text-color);
-            padding: 10px 14px;
+            padding: 10px 16px;
             border-radius: 30px;
             cursor: pointer;
             font-size: 0.85rem;
             font-weight: 600;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             -webkit-user-select: none;
             user-select: none;
         }
 
         .tool-btn:hover {
-            background: var(--accent-color);
-            color: #ffffff;
-            box-shadow: 0 0 15px var(--accent-glow);
-            border-color: transparent;
+            background: var(--glass-bg-hover);
+            color: var(--accent-color);
+            box-shadow: 0 0 20px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.4);
+            border-color: var(--accent-color);
+            transform: translateY(-1px);
         }
 
         .tool-btn.active {
             background: var(--accent-color);
             color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 0 20px var(--accent-glow);
         }
 
         h1 {
@@ -183,13 +208,20 @@
         .recommendation {
             background: var(--card-bg);
             border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-border-top);
             border-left: 4px solid var(--accent-color);
             padding: 24px;
             margin-top: 32px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .recommendation:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.25);
         }
 
         .recommendation h2 {
@@ -205,7 +237,7 @@
 
         a:hover {
             text-decoration: underline;
-            text-shadow: 0 0 8px var(--accent-glow);
+            text-shadow: 0 0 10px var(--accent-glow);
         }
 
         #drawCanvas {
@@ -338,7 +370,7 @@
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
         let penActive = false;
-        let currentTool = 'pen'; // 'pen' or 'eraser'
+        let currentTool = 'pen';
         let currentColor = '#38bdf8';
 
         function resizeCanvas() {
@@ -363,7 +395,6 @@
                 penBtn.classList.remove('active');
                 penBtn.textContent = '✏️ Pen';
                 penOptions.classList.remove('active');
-                // Reset eraser mode back to pen when closed
                 currentTool = 'pen';
                 document.getElementById('eraserBtn').classList.remove('active');
             }
@@ -374,7 +405,6 @@
             currentColor = color;
             document.getElementById('eraserBtn').classList.remove('active');
             
-            // Update active dot visual style
             document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
             element.classList.add('active');
         }
@@ -407,7 +437,7 @@
 
             if (currentTool === 'eraser') {
                 ctx.globalCompositeOperation = 'destination-out';
-                ctx.lineWidth = 20; // Thicker stroke for easy erasing
+                ctx.lineWidth = 20;
             } else {
                 ctx.globalCompositeOperation = 'source-over';
                 ctx.strokeStyle = currentColor;
